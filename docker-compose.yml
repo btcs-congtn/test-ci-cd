@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  localdb:
+    image: postgres:12
+    container_name: 'localdb'
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    ports:
+      - '15432:5432'
+    networks:
+      - postgres
+    restart: unless-stopped
+networks:
+  postgres:
