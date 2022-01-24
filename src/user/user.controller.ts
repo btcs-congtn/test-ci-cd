@@ -3,15 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   Delete,
   ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
 import { CreateUserDto, UpdateUserDto } from './dtos/index.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import AppResponse from 'src/common/models/AppResponse';
+import Collection from 'src/common/models/Collection';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -23,33 +25,47 @@ export class UserControllerV1 {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() userData: CreateUserDto): Promise<UserModel> {
-    return this.userService.create(userData);
+  async create(
+    @Body() userData: CreateUserDto,
+  ): Promise<AppResponse<UserModel>> {
+    const user = await this.userService.create(userData);
+
+    return AppResponse.ok(user);
   }
 
   @Get()
-  findAll(): Promise<UserModel[]> {
-    return this.userService.findAll();
+  async findAll(): Promise<AppResponse<Collection<UserModel>>> {
+    const collection = await this.userService.findAll();
+
+    return AppResponse.ok(collection);
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number): Promise<UserModel> {
-    return this.userService.findOne({ id });
+  async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<AppResponse<UserModel>> {
+    const user = await this.userService.findOne({ id });
+
+    return AppResponse.ok(user);
   }
 
-  @Put(':id')
-  update(
+  @Patch(':id')
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserData: UpdateUserDto,
-  ): Promise<UserModel> {
-    return this.userService.update({
+  ): Promise<AppResponse<UserModel>> {
+    const user = await this.userService.update({
       where: { id: Number(id) },
       data: { ...updateUserData },
     });
+
+    return AppResponse.ok(user);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<UserModel> {
-    return this.userService.delete({ id: Number(id) });
+  async delete(@Param('id') id: string): Promise<AppResponse<undefined>> {
+    await this.userService.delete({ id: Number(id) });
+
+    return AppResponse.ok();
   }
 }

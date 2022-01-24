@@ -15,9 +15,3 @@ model User {
   email String  @unique
   name  String?
 }
-
-model Book {
-  id    Int     @default(autoincrement()) @id
-  isbn  String  @unique
-  name  String?
-}

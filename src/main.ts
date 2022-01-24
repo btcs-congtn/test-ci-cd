@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as helmet from 'helmet';
 
 import { AppModule } from './app.module';
+import AppResponse from './common/models/AppResponse';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,12 @@ async function bootstrap() {
   });
 
   // auto validation
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: AppResponse.validationFailedFromValidatorErrors,
+    }),
+  );
 
   // swagger OPENAPI
   const config = new DocumentBuilder()
