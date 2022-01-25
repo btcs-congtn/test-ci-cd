@@ -3,11 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from './prisma.service';
-import { UserControllerV1 } from './user/user.controller';
+import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,9 +15,10 @@ import { UserService } from './user/user.service';
         '.env.production',
       ],
     }),
+    DatabaseModule,
     UserModule,
   ],
-  controllers: [AppController, UserControllerV1],
-  providers: [AppService, UserService, PrismaService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
