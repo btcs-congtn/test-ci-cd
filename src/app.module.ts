@@ -1,10 +1,14 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
+import { AgentModule } from './agent/agent.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthMiddleware } from 'src/middlewares/auth.middleware';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,9 +20,15 @@ import { UserModule } from './user/user.module';
       ],
     }),
     DatabaseModule,
+    AuthModule,
     UserModule,
+    AgentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('v1/agents');
+  }
+}
